@@ -13,13 +13,17 @@ implemented.
 
 ## Run step 1
 
-1. Click **Open in Colab** above and sign in to Google.
-2. If GitHub access is requested, sign in to GitHub and authorize access to this
-   private repository. You can also use Colab's **File → Open notebook → GitHub**
-   tab and enter `333HaI/crypto-volatility-radar`.
-3. Connect to a Python runtime. A **CPU runtime is sufficient for step 1**.
-4. Select **Runtime → Run all**.
-5. Check that the final cell prints:
+1. Open [Colab's GitHub browser](https://colab.research.google.com/github) and
+   sign in to Google.
+2. Check **Include Private Repos**. In the popup, sign in to GitHub as `333HaI`
+   and authorize Colab to read private repositories. Being signed in to GitHub
+   in another tab does not replace this authorization.
+3. Search for `333HaI/crypto-volatility-radar`, choose branch `main`, and open
+   `notebooks/crypto_volatility_radar.ipynb`. After authorization, the **Open in
+   Colab** badge above should also work.
+4. Connect to a Python runtime. A **CPU runtime is sufficient for step 1**.
+5. Select **Runtime → Run all**.
+6. Check that the final cell prints:
 
    ```text
    Step 1 setup OK.
@@ -27,6 +31,12 @@ implemented.
    Planned targets: 6 channels; horizon: 24 hourly steps.
    Stop here. Step 2 will add the synthetic TimesFM-3 inference check.
    ```
+
+If the direct Colab link reports GitHub `404 Not Found`, complete steps 1–2
+first. GitHub hides private resources from unauthenticated requests with a 404;
+this can happen even when the notebook exists. See
+[Google's private-notebook instructions](https://github.com/googlecolab/colabtools/blob/main/notebooks/colab-github-demo.ipynb)
+and [GitHub's authentication explanation](https://docs.github.com/en/rest/using-the-rest-api/troubleshooting-the-rest-api#404-not-found-for-an-existing-resource).
 
 If Colab cannot access the private repository, download
 [`notebooks/crypto_volatility_radar.ipynb`](notebooks/crypto_volatility_radar.ipynb)
