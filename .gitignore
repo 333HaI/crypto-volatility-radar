@@ -1,0 +1,45 @@
+# Python and local environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+.pytest_cache/
+*.egg-info/
+
+# Credentials: use environment variables or Colab Secrets when needed.
+.env
+.env.*
+*.pem
+*.key
+credentials*.json
+service-account*.json
+token.txt
+.streamlit/secrets.toml
+
+# Downloaded data and generated results stay local.
+/data/*
+!/data/.gitkeep
+/outputs/*
+!/outputs/.gitkeep
+
+# Model weights and caches never belong in this repository.
+models/
+weights/
+checkpoints/
+.cache/
+.hf_cache/
+huggingface/
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.onnx
+*.h5
+
+# Local editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
