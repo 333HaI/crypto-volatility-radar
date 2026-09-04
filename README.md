@@ -1,4 +1,4 @@
-# Crypto Volatility Radar
+# brypt0-vol-radar
 
 This repo is me trying out Google's TimesFM-3 model on crypto data. The main
 question is whether its multivariate setup can learn anything useful from BTC,
@@ -8,7 +8,7 @@ The planned targets are 24-hour realized volatility and trading volume. I also
 want to try time-of-day, scheduled macro events, funding rates, and open interest
 as covariates where the data is good enough.
 
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/333HaI/crypto-volatility-radar/blob/main/notebooks/crypto_volatility_radar.ipynb)
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/333HaI/brypt0-vol-radar/blob/main/notebooks/brypt0_vol_radar.ipynb)
 
 ## What works so far
 
@@ -51,7 +51,7 @@ asset, so BTC, ETH, and SOL volumes are not directly comparable yet.
 
 ```text
 crypto_radar/data.py                  Coinbase candle downloader
-notebooks/crypto_volatility_radar.ipynb
+notebooks/brypt0_vol_radar.ipynb
 requirements.txt
 data/                                 downloaded data (ignored)
 outputs/                              generated forecasts (ignored)

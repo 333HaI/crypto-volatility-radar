@@ -85,7 +85,7 @@ def download_hourly_market_data(
     start = end - pd.Timedelta(days=days)
 
     session = requests.Session()
-    session.headers.update({"User-Agent": "crypto-volatility-radar/0.1"})
+    session.headers.update({"User-Agent": "brypt0-vol-radar/0.1"})
 
     frames = []
     for asset, product_id in PRODUCTS.items():
