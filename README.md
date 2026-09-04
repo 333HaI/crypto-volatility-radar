@@ -1,128 +1,74 @@
 # Crypto Volatility Radar
 
-A small forecasting project I am building to learn how TimesFM-3 behaves on
-crypto market data. The goal is to jointly forecast 24 hours of realized
-volatility and trading volume for BTC, ETH, and SOL, then show the result in a
-simple dashboard.
+This repo is me trying out Google's TimesFM-3 model on crypto data. The main
+question is whether its multivariate setup can learn anything useful from BTC,
+ETH, and SOL moving together.
 
-This is being built one step at a time. The first real candles are downloading
-now, but there is no trading signal here yet.
+The planned targets are 24-hour realized volatility and trading volume. I also
+want to try time-of-day, scheduled macro events, funding rates, and open interest
+as covariates where the data is good enough.
 
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/333HaI/crypto-volatility-radar/blob/main/notebooks/crypto_volatility_radar.ipynb)
 
-## Where it is now
+## What works so far
 
-- [x] Basic repo and Colab notebook
-- [x] TimesFM-3 synthetic forecast (verified locally; Colab GPU run below)
-- [x] Hourly BTC, ETH, and SOL downloader
-- [ ] Returns, realized volatility, and volume features
-- [ ] 24-hour forecasts with quantiles
-- [ ] Rolling-average baseline
-- [ ] Streamlit/Plotly dashboard
-- [ ] Screenshots and final write-up
+The notebook can load TimesFM-3 and make a joint 24-hour forecast for six
+synthetic series: volatility and volume for each coin. It returns a point
+forecast plus p10-p90 quantiles. I checked the same call locally with the real
+`timesfm==3.0.1` model and got the expected `(6, 24)` and `(6, 24, 9)` arrays.
 
-## Run step 2
+There is also a downloader for 180 days of hourly BTC-USD, ETH-USD, and SOL-USD
+candles from Coinbase Exchange. My latest run returned 4,315 rows per asset with
+no duplicates or broken OHLCV rows.
 
-The repo is private, so authorize it before using the badge:
+## Notebook
 
-1. Open [Colab's GitHub browser](https://colab.research.google.com/github).
-2. Check **Include Private Repos** and authorize GitHub account `333HaI`.
-3. Open `333HaI/crypto-volatility-radar`, branch `main`, then
-   `notebooks/crypto_volatility_radar.ipynb`.
-4. Choose **Runtime > Change runtime type > T4 GPU**.
-5. Choose **Runtime > Run all**.
+The notebook is easiest to run in Colab with a T4 GPU. Since this repo is
+private, first open [Colab's GitHub browser](https://colab.research.google.com/github),
+check **Include Private Repos**, and authorize the `333HaI` GitHub account. Then
+open `notebooks/crypto_volatility_radar.ipynb` and use **Runtime > Run all**.
 
-The first run installs `timesfm==3.0.1` and downloads the public TimesFM-3
-checkpoint into Colab's temporary cache. Nothing is downloaded into this repo.
-The last cell should print:
+The first model run downloads the public TimesFM-3 checkpoint to Colab's
+temporary cache. No Hugging Face token is needed. The small synthetic example
+also works on CPU, although the actual forecasting experiments will use a GPU.
 
-```text
-Step 2 passed on cuda: TimesFM-3 ran a 6-series, 24-hour forecast.
-Forecast shape: (6, 24)
-Quantile shape: (6, 24, 9)
-Next: stop here. Real hourly market data comes in step 3.
-```
+## Downloading the data locally
 
-If the notebook link gives a GitHub 404, Colab has not been given access to the
-private repo yet. Go back to step 1 above and check **Include Private Repos**.
-You can also download the notebook from GitHub and upload it to Colab manually.
-
-## What this test does
-
-The step-2 section makes six fake hourly series: volatility and volume for each asset.
-They have a daily pattern and a fake scheduled event. TimesFM-3 forecasts all six
-series together for 24 hours, using hour-of-day and the event flag as
-known-future covariates. A few assertions check the output shapes, finite values,
-quantile ordering, and the p50 forecast.
-
-Passing this test only proves that the model API and our array shapes work. It
-does not say anything about forecast quality on real crypto data.
-
-I also ran the same forecast call locally on September 4, 2026 with
-`timesfm==3.0.1`. The real model returned `(6, 24)` point forecasts and
-`(6, 24, 9)` quantiles. That run used CPU; the notebook checks the Colab GPU path.
-
-## Run step 3
-
-Step 3 does not need a GPU or an API key. In the Colab notebook, scroll to
-**Step 3 — download hourly candles** and run the three code cells in that
-section. It writes `data/hourly_market_data.csv` in the temporary Colab session
-and prints a small coverage table.
-
-To do the same thing from a local checkout:
+From the project root:
 
 ```bash
 python -m pip install -r requirements.txt
 python -m crypto_radar.data --days 180
 ```
 
-My test run downloaded 12,945 rows: 4,315 for each asset. There were no duplicate
-hours or invalid OHLCV rows. Coinbase was missing the same five hours for all
-three products on May 8, 2026, and a second direct request confirmed the gap.
-The downloader reports missing buckets and leaves them alone for step 4.
+This creates `data/hourly_market_data.csv`. The file is ignored by Git because it
+can be downloaded again.
 
-Expected final message:
+Coinbase's candle API sometimes has gaps. The current data is missing five shared
+hours on May 8, 2026; a second request returned the same gap. I leave those rows
+missing for now instead of quietly filling them. Volume is reported in the base
+asset, so BTC, ETH, and SOL volumes are not directly comparable yet.
 
-```text
-Step 3 passed: downloaded and checked 12,945 hourly candles.
-Hours missing for all three assets: 5
-The CSV is ready for feature work. Stop here before step 4.
-```
-
-The row and gap counts may change if Coinbase updates its history or if you run
-the notebook later.
-
-## Files
+## Project layout
 
 ```text
-crypto_radar/data.py                  reusable Coinbase downloader
-data/                                 local downloads; ignored by Git
+crypto_radar/data.py                  Coinbase candle downloader
 notebooks/crypto_volatility_radar.ipynb
-outputs/                              generated files; ignored by Git
 requirements.txt
+data/                                 downloaded data (ignored)
+outputs/                              generated forecasts (ignored)
 ```
 
-## A couple of project choices
+## Still to add
 
-- Everything uses an hourly UTC grid.
-- Funding and open interest will be historical covariates if the free data is
-  decent enough.
-- Hour-of-day, day-of-week, and scheduled CPI/FOMC/NFP flags are candidates for
-  known-future covariates. Actual event outcomes will never be future inputs.
-- Forecasts run in Colab. The later dashboard will read saved forecast results.
-- Raw data comes from Coinbase Exchange's public candle endpoint. Its volume is
-  in base-asset units, so it is not directly comparable across coins yet.
+- Return, realized-volatility, and volume features
+- Forecasts on the real series
+- A rolling-average baseline
+- A small Streamlit/Plotly dashboard
+- Funding, open interest, and macro-event covariates if they are practical
 
-## License note
+## Model license
 
-The [TimesFM source](https://github.com/google-research/timesfm) is Apache-2.0,
-but the [TimesFM-3 weights](https://huggingface.co/google/timesfm-3.0-pytorch)
-currently have a separate non-commercial, non-production license. This repo is a
-learning/research project.
-
-## Saving from Colab
-
-Use **File > Save a copy in GitHub**, pick this repo and notebook path, and omit
-cell outputs. Keep secrets in Colab Secrets. Model files, downloaded data,
-credentials, and generated outputs are ignored, but it is still worth checking
-`git status` before committing.
+The [TimesFM source](https://github.com/google-research/timesfm) is Apache-2.0.
+The [TimesFM-3 weights](https://huggingface.co/google/timesfm-3.0-pytorch) use a
+separate non-commercial, non-production license. This is an exploratory project.

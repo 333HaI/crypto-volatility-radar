@@ -1,1 +1,1 @@
-"""Reusable code for Crypto Volatility Radar, added as the project grows."""
+"""Helpers used by the notebook and dashboard."""
