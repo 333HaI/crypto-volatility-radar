@@ -37,7 +37,7 @@ checkpoint into Colab's temporary cache. Nothing is downloaded into this repo.
 The last cell should print:
 
 ```text
-Step 2 passed: TimesFM-3 ran a 6-series, 24-hour forecast on the GPU.
+Step 2 passed on cuda: TimesFM-3 ran a 6-series, 24-hour forecast.
 Forecast shape: (6, 24)
 Quantile shape: (6, 24, 9)
 Next: stop here. Real hourly market data comes in step 3.
