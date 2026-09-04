@@ -5,8 +5,8 @@ crypto market data. The goal is to jointly forecast 24 hours of realized
 volatility and trading volume for BTC, ETH, and SOL, then show the result in a
 simple dashboard.
 
-This is being built one step at a time. Right now the data is synthetic. No
-trading signal here yet.
+This is being built one step at a time. The first real candles are downloading
+now, but there is no trading signal here yet.
 
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/333HaI/crypto-volatility-radar/blob/main/notebooks/crypto_volatility_radar.ipynb)
 
@@ -14,7 +14,7 @@ trading signal here yet.
 
 - [x] Basic repo and Colab notebook
 - [x] TimesFM-3 synthetic forecast (verified locally; Colab GPU run below)
-- [ ] Hourly BTC, ETH, and SOL data
+- [x] Hourly BTC, ETH, and SOL downloader
 - [ ] Returns, realized volatility, and volume features
 - [ ] 24-hour forecasts with quantiles
 - [ ] Rolling-average baseline
@@ -49,7 +49,7 @@ You can also download the notebook from GitHub and upload it to Colab manually.
 
 ## What this test does
 
-The notebook makes six fake hourly series: volatility and volume for each asset.
+The step-2 section makes six fake hourly series: volatility and volume for each asset.
 They have a daily pattern and a fake scheduled event. TimesFM-3 forecasts all six
 series together for 24 hours, using hour-of-day and the event flag as
 known-future covariates. A few assertions check the output shapes, finite values,
@@ -62,10 +62,40 @@ I also ran the same forecast call locally on September 4, 2026 with
 `timesfm==3.0.1`. The real model returned `(6, 24)` point forecasts and
 `(6, 24, 9)` quantiles. That run used CPU; the notebook checks the Colab GPU path.
 
+## Run step 3
+
+Step 3 does not need a GPU or an API key. In the Colab notebook, scroll to
+**Step 3 — download hourly candles** and run the three code cells in that
+section. It writes `data/hourly_market_data.csv` in the temporary Colab session
+and prints a small coverage table.
+
+To do the same thing from a local checkout:
+
+```bash
+python -m pip install -r requirements.txt
+python -m crypto_radar.data --days 180
+```
+
+My test run downloaded 12,945 rows: 4,315 for each asset. There were no duplicate
+hours or invalid OHLCV rows. Coinbase was missing the same five hours for all
+three products on May 8, 2026, and a second direct request confirmed the gap.
+The downloader reports missing buckets and leaves them alone for step 4.
+
+Expected final message:
+
+```text
+Step 3 passed: downloaded and checked 12,945 hourly candles.
+Hours missing for all three assets: 5
+The CSV is ready for feature work. Stop here before step 4.
+```
+
+The row and gap counts may change if Coinbase updates its history or if you run
+the notebook later.
+
 ## Files
 
 ```text
-crypto_radar/                         reusable Python code (added when useful)
+crypto_radar/data.py                  reusable Coinbase downloader
 data/                                 local downloads; ignored by Git
 notebooks/crypto_volatility_radar.ipynb
 outputs/                              generated files; ignored by Git
@@ -80,6 +110,8 @@ requirements.txt
 - Hour-of-day, day-of-week, and scheduled CPI/FOMC/NFP flags are candidates for
   known-future covariates. Actual event outcomes will never be future inputs.
 - Forecasts run in Colab. The later dashboard will read saved forecast results.
+- Raw data comes from Coinbase Exchange's public candle endpoint. Its volume is
+  in base-asset units, so it is not directly comparable across coins yet.
 
 ## License note
 

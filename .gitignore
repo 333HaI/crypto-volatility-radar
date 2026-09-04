@@ -20,6 +20,7 @@ token.txt
 # Downloaded data and generated results stay local.
 /data/*
 !/data/.gitkeep
+!/data/README.md
 /outputs/*
 !/outputs/.gitkeep
 
