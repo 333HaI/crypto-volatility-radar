@@ -23,10 +23,8 @@ no duplicates or broken OHLCV rows.
 
 ## Notebook
 
-The notebook is easiest to run in Colab with a T4 GPU. Since this repo is
-private, first open [Colab's GitHub browser](https://colab.research.google.com/github),
-check **Include Private Repos**, and authorize the `333HaI` GitHub account. Then
-open `notebooks/crypto_volatility_radar.ipynb` and use **Runtime > Run all**.
+The notebook is easiest to run in Colab with a T4 GPU. Click the badge above,
+choose **Runtime > Change runtime type > T4 GPU**, and use **Runtime > Run all**.
 
 The first model run downloads the public TimesFM-3 checkpoint to Colab's
 temporary cache. No Hugging Face token is needed. The small synthetic example
